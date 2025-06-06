@@ -1,0 +1,3 @@
+main_investor_app=
+company_app=take companies and add few info from internet and few from sheet
+buyer_company_app=take companies and do analysis based on sheet
