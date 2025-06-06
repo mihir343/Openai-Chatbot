@@ -26,7 +26,7 @@ def remove_file(xlsx_path):
     if os.path.exists(xlsx_path):
         os.remove(xlsx_path)
        
-def generate_first_response(company_urls,instruction,text_format):
+def generate_first_response(company_urls,instruction):
     client = OpenAI(api_key=OPEN_API_KEY)
     company_url_str = '<CompanyList>\n' + "\n".join(company_urls) + '\n<CompanyList>'
     user_input = f"Analyze these companies:\n{company_url_str}"
@@ -36,7 +36,7 @@ def generate_first_response(company_urls,instruction,text_format):
         tools=[{"type": "web_search_preview"}],
         input=user_input,
         instructions=instruction,
-        text_format=text_format,
+        text_format=text_formate_1,
     )
     if len(response.output)>1:
         # extracted_data = response.output[1].content[0]['parsed']['extracted_data']
@@ -165,7 +165,7 @@ def get_final_second_response(file_name,first_result_data):
     print("All second responses are Generated...")
     return final_result
 
-def generate_final_result(file_path,result_data):
+def update_final_result(file_path,result_data):
     df = pd.read_excel(f"excelfile/{file_path}")
     columns=[
         "Short Title",
@@ -189,3 +189,10 @@ def generate_final_result(file_path,result_data):
                         
     write_simple_json('data/update_final_result.json',result_data)
     print(f"✅ All done! Updated Results are saved")
+    return result_data
+
+def generate_final_result(batch_companies,file_name):
+    batch_result_data=generate_first_response(batch_companies,get_instruction_1(file_name))
+    second_result=get_final_second_response(file_name,batch_result_data)
+    final_result=update_final_result(file_name,second_result)
+    return final_result
